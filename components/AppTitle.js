@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 
-import { aspect, color } from '../config';
+import { aspect } from '../config';
 
 const img = require('../assets/logos/logo.png');
 
@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   image: {
     width,

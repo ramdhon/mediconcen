@@ -1,6 +1,5 @@
 import React from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import Constants from 'expo-constants';
+import { Text, View, SafeAreaView, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
 
 import * as Permissions from 'expo-permissions';
 import { BarCodeScanner } from 'expo-barcode-scanner';
@@ -27,13 +26,21 @@ export default class BarcodeScannerExample extends React.Component {
     const { hasCameraPermission, scanned, alert } = this.state;
 
     if (hasCameraPermission === null) {
-      return <Text>Requesting for camera permission</Text>;
+      return (
+        <SafeAreaView>
+          <View style={styles.center}>
+            <Text>Requesting for camera permission</Text>
+          </View>
+        </SafeAreaView>
+      )
     }
     if (hasCameraPermission === false) {
       return (
-        <View style={styles.center}>
-          <Text>No access to camera</Text>
-        </View>
+        <SafeAreaView>
+          <View style={styles.center}>
+            <Text>No access to camera</Text>
+          </View>
+        </SafeAreaView>
       )
     }
     return (
@@ -57,24 +64,18 @@ export default class BarcodeScannerExample extends React.Component {
   }
 
   handleBarCodeScanned = ({ type, data }) => {
-    const { navigation } = this.props;
-    const params = {
-      name: 'ECG'
-    }
-
     this.setState({ scanned: true, alert: true });
     Alert.alert(
-      'Data Found',
+      'Code Scanned',
       `Type: ${type}\nData: ${data}`,
       [
         {text: 'Scan another', onPress: () => this.setState({ scanned: false, alert: false })},
         {
-          text: 'See asset detail',
+          text: 'Cancel',
           onPress: () => {
             this.setState({ alert: false });
-            navigation.navigate('DetailAsset', { name: params.name, detailCharts: true, pk: data });
           },
-          style: 'cancel',
+          style: 'cancel'
         }
       ],
       {cancelable: false}
@@ -92,7 +93,8 @@ const styles = StyleSheet.create({
   center: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    paddingTop: Platform.OS === 'android' ? space.container : 0
   },
   circleButton: {
     width: 80,
@@ -102,7 +104,7 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     borderColor: color.plain,
     borderWidth: 5,
-    margin: space.wide,
+    margin: space.wide
   },
   buttonText: {
     color: color.plain,

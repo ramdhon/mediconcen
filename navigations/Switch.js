@@ -11,5 +11,5 @@ export default createSwitchNavigator({
     screen: Main
   }
 }, {
-  initialRouteName: 'Main'
+  initialRouteName: 'Login'
 })

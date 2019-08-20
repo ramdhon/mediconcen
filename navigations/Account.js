@@ -8,11 +8,12 @@ import { color } from '../config';
 export default createStackNavigator({
   Account: {
     screen: Account,
-    navigationOptions: {
+    navigationOptions: ({ navigation }) => ({
       headerTitle: (props) => <AppTitle {...props} />,
       headerStyle: {
         backgroundColor: color.background
-      }
-    }
+      },
+      headerTintColor: color.plain
+    })
   }
 })
