@@ -25,6 +25,8 @@
     ],
     "ios": {
       "supportsTablet": true
-    }
+    },
+    "description": "# mediconcen App\n\nThis app is build using Expo React Native Tools. The published URL can be access in Expo published URL:\n\nhttps://expo.io/@ramdhon/mediconcenApp\n\nThis app is simply CRUD management system.\n\nThis app is also included with reactive search function.\n\nTHis app is using AsyncStorage feature to store data, so it is working locally database.\n\nThis app is integrated with sign in system, you can access the app with this specification of user:\n\n```\nUsername : user\nPassword : user\n```\n\nThis app is also integrated with qr or bar code scanner, when navigating to scanner menu, allow for accessing your camera, point to the code to be scanned, pop up will show the type of barcode and data contained in it.\n\nIf you are concerned to develop this, you can clone the repository. then install the required packages with:\n```\nyarn\n```\n\nAfter that run the app:\n```\nyarn start\n```\n\nThis app is build for learning purpose only.",
+    "githubUrl": "https://github.com/ramdhon/mediconcen"
   }
 }

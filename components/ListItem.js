@@ -1,18 +1,45 @@
 import React, { useState } from 'react';
-import { View, Text, Alert, StyleSheet } from 'react-native';
+import { View, Text, Alert, AsyncStorage, StyleSheet } from 'react-native';
 import { Button, Icon } from 'native-base';
 import Swipeout from 'react-native-swipeout';
 
 import { space, color, fontSize } from '../config';
 
-const ListItem = ({ navigation, item }) => {
+const ListItem = ({ navigation, item, onDelete, onEdit }) => {
   const [isDetail, setIsDetail] = useState(false);
 
   const toogleDetail = () => {
     setIsDetail(!isDetail);
   }
-  const onSubmit = () => {
-    return 0;
+  const deleteItem = () => {
+    const { id } = item;
+    AsyncStorage.getItem('list')
+      .then(list => {
+        let data = [];
+        if (list) {
+          data = [...JSON.parse(list)]          
+        }
+        data = data.filter(obj => obj.id !== item.id);
+        // return AsyncStorage.removeItem('list')
+        AsyncStorage.setItem('list', JSON.stringify(data))
+      })
+      .then(info => {
+        onDelete(id);
+      })
+      .catch(err => {
+        console.log({ message: 'AsyncStorage ListItem', err });
+        Alert.alert(
+          'Error: 500',
+          'Async Form',
+          [
+            {
+              text: 'OK',
+              style: 'cancel',
+            }
+          ],
+          {cancelable: false}
+        );
+      })
   }
 
   const swipeoutBtns = [
@@ -28,7 +55,7 @@ const ListItem = ({ navigation, item }) => {
         </View>
       ),
       onPress: () => {
-        navigation.navigate('Form', { onSubmit, item });
+        navigation.navigate('Form', { onEdit, item });
       }
     },
     {
@@ -53,6 +80,7 @@ const ListItem = ({ navigation, item }) => {
             },
             {
               text: 'Confirm',
+              onPress: deleteItem
             }
           ],
           {cancelable: false}
@@ -62,23 +90,25 @@ const ListItem = ({ navigation, item }) => {
   ]
 
   return (
-    <Swipeout right={swipeoutBtns} onOpen={() => setIsDetail(false)} style={styles.swipe}>
+    <Swipeout autoClose right={swipeoutBtns} onOpen={() => setIsDetail(false)} style={styles.swipe}>
       <View style={styles.container}>
         <Icon
           name="images"
           style={styles.icon}
         />
-        <View style={styles.content}>
-          <Text style={styles.titleText}>{item.title}</Text>
-          { 
-            isDetail ? 
-              <Text style={styles.descriptionText}>{item.description}</Text>
-            :
-              <Text numberOfLines={1} style={styles.descriptionTruncText}>{item.description}</Text>
-          }
-          <Button small transparent onPress={toogleDetail}>
-            <Text style={styles.buttonText}>See details...</Text>
-          </Button>
+        <View style={styles.row}>
+          <View style={styles.content}>
+            <Text style={styles.titleText}>{item.title}</Text>
+            { 
+              isDetail ? 
+                <Text style={styles.descriptionText}>{item.description}</Text>
+              :
+                <Text numberOfLines={1} style={styles.descriptionTruncText}>{item.description}</Text>
+            }
+            <Button small transparent onPress={toogleDetail}>
+              <Text style={styles.buttonText}>See details...</Text>
+            </Button>
+          </View>
         </View>
       </View>
     </Swipeout>
@@ -91,13 +121,17 @@ const styles = StyleSheet.create({
   swipe: {
     backgroundColor: color.plain
   },
+  row: {
+    flex: 1,
+    flexDirection: 'row'
+  },
   container: {
     flex: 1,
     padding: space.fluid,
     flexDirection: 'row'
   },
   content: {
-    paddingHorizontal: space.fluid
+    paddingLeft: space.fluid
   },
   titleText: {
     color: color.active,

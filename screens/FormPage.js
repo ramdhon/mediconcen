@@ -8,7 +8,7 @@ const FormPage = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const { onSubmit, item } = navigation.state.params;
+  const { onSubmit, onEdit, item } = navigation.state.params;
 
   const handleTitle = (eText) => {
     setTitle(eText);
@@ -18,19 +18,20 @@ const FormPage = ({ navigation }) => {
   }
   const submit = () => {
     setLoading(true);
+    const id = (Math.round(Math.random() * 89999999) + 10000000).toString();
     AsyncStorage.getItem('list')
       .then(list => {
         let data = [];
         if (list) {
           data = [...JSON.parse(list)]          
         }
-        data.unshift({ title, description })
+        data.unshift({ id, title, description })
         // return AsyncStorage.removeItem('list')
         return AsyncStorage.setItem('list', JSON.stringify(data))
       })
       .then(info => {
         setLoading(false);
-        onSubmit({ title, description });
+        onSubmit({ id, title, description });
         navigation.navigate('Dashboard');
       })
       .catch(err => {
@@ -47,7 +48,41 @@ const FormPage = ({ navigation }) => {
           ],
           {cancelable: false}
         );
-      }) 
+      })
+  }
+  const edit = () => {
+    setLoading(true);
+    const { id } = item;
+    AsyncStorage.getItem('list')
+      .then(list => {
+        let data = [];
+        if (list) {
+          data = [...JSON.parse(list)]          
+        }
+        data = [{ id, title, description }, ...data.filter(obj => obj.id !== item.id)]
+        // return AsyncStorage.removeItem('list')
+        return AsyncStorage.setItem('list', JSON.stringify(data))
+      })
+      .then(info => {
+        setLoading(false);
+        onEdit({ id, title, description });
+        navigation.navigate('Dashboard');
+      })
+      .catch(err => {
+        setLoading(false);
+        console.log({ message: 'AsyncStorage Form', err });
+        Alert.alert(
+          'Error: 500',
+          'Async Form',
+          [
+            {
+              text: 'OK',
+              style: 'cancel',
+            }
+          ],
+          {cancelable: false}
+        );
+      })
   }
 
   useEffect(() => {
@@ -81,12 +116,12 @@ const FormPage = ({ navigation }) => {
             </Form>
           </ScrollView>
           <View style={styles.submitArea}>
-            <Button block info onPress={submit}>
+            <Button block info onPress={onEdit ? edit : submit}>
               {
                 loading ? 
                   <ActivityIndicator color={color.plain} />
                 :
-                  <Text style={styles.buttonText}>{item ? 'Edit' : 'Submit'}</Text>
+                  <Text style={styles.buttonText}>{item ? 'Update' : 'Submit'}</Text>
               }
             </Button>
           </View>
